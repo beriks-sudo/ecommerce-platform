@@ -27,3 +27,6 @@ check:
 	@echo "Unknown target '$@'. Available targets:"
 	@$(MAKE) --no-print-directory help
 	@exit 1
+
+history:
+	git log --oneline --decorate -5
