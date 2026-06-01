@@ -1,10 +1,30 @@
+# Secrets / environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Coverage / test reports
+coverage/
+*.coverage
+.nyc_output/
+
+# Build output
+dist/
+build/
+out/
+
+# OS / editor artifacts
 .DS_Store
 Thumbs.db
 .idea/
-vendor/
-.env
-.env.local
-logs
-coverage
-build output
-OS/editor artifacts
+.vscode/
+*.swp
+
+# Temporary files
+tmp/
+*.tmp
+*.bak
