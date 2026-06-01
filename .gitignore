@@ -3,3 +3,8 @@ Thumbs.db
 .idea/
 vendor/
 .env
+.env.local
+logs
+coverage
+build output
+OS/editor artifacts
