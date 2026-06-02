@@ -1,31 +1,80 @@
-create branch -> commit -> push -> pull request -> review/checks -> merge to protected main -> deploy
+# Pull Request workflow — ecommerce-platform
 
-GitHub protected branches позволяют требовать pull request review, status checks, linear history, ограничения push и другие правила: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches. Rulesets расширяют эту модель и позволяют применять наборы правил к branches и tags: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets. Эти настройки являются платформенной частью контракта, который ты описываешь словами в homework
+Документ описывает, как изменение проходит путь от ветки до production:
+именование веток, последовательность действий, чек-лист PR, обязательные
+проверки, релиз с откатом и ограничения процесса.
 
-- Branch is short-lived and based on current main
-- make check passes locally
-- CI is green
-- Reviewer understands scope and risk
-- No direct push to main
-- Rollback or revert path is written
-- Release impact is clear
+## Branch naming (правило именования веток)
 
-make check, git diff --check, passing CI, review approval, protected main
+Имя ветки = тип работы + короткое описание задачи через дефис:
 
+    <type>/<short-description>
 
-После этого PR description отвечает на вопросы reviewer: зачем изменение, какой scope, какие checks прошли, какой риск, как откатиться, есть ли release impact. Если изменение видимое, нужны screenshots или короткое описание поведения. Если изменение касается migration, background job, API или config, это нужно назвать явно. В Git course мы пока пишем workflow docs, но привычка к risk note закладывается здесь.
+Разрешённые типы:
+- `feature/*` — новая возможность. Пример: `feature/cart-empty-state`
+- `fix/*` — исправление бага. Пример: `fix/checkout-total-rounding`
+- `hotfix/*` — срочное исправление production. Пример: `hotfix/payment-timeout`
+- `release/*` — стабилизация выпуска. Пример: `release/1.5`
+- `chore/*` — обслуживание репозитория. Пример: `chore/update-gitignore`
 
-Хороший PR checklist не должен быть формальностью на десять галочек. Он должен останавливать реальные ошибки. Например:
+Правила: только латиница в нижнем регистре, слова через дефис, без пробелов
+и имён файлов. Ветка создаётся от актуального `main` (hotfix — от main или
+release tag). Ветка короткоживущая.
 
-- Branch is short-lived and based on current main
-- make check passes locally
-- CI is green
-- Reviewer understands scope and risk
-- No direct push to main
-- Rollback or revert path is written
-- Release impact is clear
-  Неправильная версия: main protected на бумаге, но admin постоянно нажимает bypass, потому что CI flaky. Это не ускорение, а разрушение сигнала. Правильная реакция: назначить CI owner, стабилизировать tests, временно карантинировать flaky check с явным issue, но не превращать bypass в normal path. Если правило постоянно обходится, оно либо неверно выбрано, либо не поддержано инфраструктурой.
+## Flow (последовательность действий)
 
-PR discipline также защищает от слишком больших changes. Reviewer не должен угадывать, что скрыто в PR на 70 files. Если diff большой, автор делит работу на smaller PRs или заранее пишет план review. Это особенно важно для будущих Laravel проектов: один PR может трогать routes, controllers, policies, migrations, frontend components и tests. Без discipline review превращается в просмотр глазами, а не в инженерную проверку.
+Путь изменения от ветки до main:
 
-Protected main не отменяет доверие в команде. Он делает доверие воспроизводимым. Новый разработчик, опытный maintainer и release owner работают через одинаковый gate. Когда все зеленое и review завершен, merge не зависит от личной памяти. Когда что-то красное, команда видит конкретный stop signal и разбирает причину.
+1. Создать ветку от актуального main:
+   `git switch -c feature/<task> origin/main`
+2. Сделать маленькое изменение.
+3. Локальный preflight: `make check`, `git status --short`, `git diff --check`.
+4. Закоммитить осознанные файлы (не `git add .`), сообщение по Conventional Commits.
+5. Запушить ветку и открыть PR в main.
+6. Пройти gates: CI зелёный + review approval.
+7. Merge в protected main (direct push запрещён).
+8. Release decision: тегать/деплоить или ждать следующего named release.
+
+## Pull Request checklist (чек-лист PR)
+
+Перед запросом review автор проверяет:
+
+- [ ] PR маленький, одно логическое изменение (атомарность).
+- [ ] Заголовок PR по Conventional Commits (`type(scope): description`).
+- [ ] Описание PR: что менялось, зачем, какой risk.
+- [ ] `make check` пройден локально (зелёный).
+- [ ] `git status --short` — в PR только нужные файлы, нет .env/логов/tmp.
+- [ ] `git diff --check` — нет whitespace-ошибок и конфликтных маркеров.
+- [ ] Breaking change отмечен (`!` / `BREAKING CHANGE`) если ломает contract.
+- [ ] Указан rollback path, если изменение рискованное.
+- [ ] Ветка создана от актуального main, конфликтов нет.
+
+## Required checks (необходимые проверки)
+
+Изменение не попадает в main, пока не пройдёт все барьеры:
+
+1. Local `make check` — author preflight (тесты, линтер) до PR.
+2. CI — required status checks; красный CI блокирует merge.
+3. Review approval — минимум один апрув, reviewer смотрит diff и risk.
+4. Protected main — direct push запрещён, failing checks блокируют merge.
+
+Принцип: в main попадает только проверенное и прошедшее gates, а не
+«брошенное в pipeline на удачу».
+
+## Release & rollback (релиз и откат)
+
+Release:
+- Released commit — это commit, на котором стоит release tag и который
+  задеплоен. Связь tag ↔ commit ↔ deploy проверяема (tag в репозитории,
+  запись в deployment log / release notes).
+- Tag ставит release owner после прохождения проверок:
+  `git tag v1.5.0 && git push origin v1.5.0`.
+
+Rollback (при плохом деплое):
+- Первый шаг — повторный деплой предыдущего known-good артефакта
+  (предыдущий tag, например `v1.4.0`). Откат дешёвый.
+- Если откат на артефакт невозможен — revert проблемного изменения через PR
+  (с теми же gates), а не прямой push в main.
+- Решение об откате принимает release owner; rollback path описан в release
+  notes заранее, до production decision.
+
