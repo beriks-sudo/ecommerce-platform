@@ -190,30 +190,6 @@ https://hub.docker.com/
 For more examples and ideas, visit:
 https://docs.docker.com/get-started/
 Что показывает make docker-ps.
-CONTAINER ID   IMAGE                                             COMMAND                  CREATED       STATUS                     PORTS                                                                                NAMES
-08b1a7960e09   alpine/socat                                      "socat TCP-LISTEN:18…"   3 hours ago   Up 3 hours                 127.0.0.1:18000->18000/tcp                                                           ingest-bridge
-8bcd9e442b72   forsell-web-platform-ingest                       "uvicorn app.main:ap…"   3 hours ago   Up 3 hours (healthy)       8000/tcp                                                                             4sell-ingest
-c9f1b0385f6a   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-app
-c3b1a696cc4f   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-device-api
-f74ddd75d9fe   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-scramble
-bbfaab7a6e39   4sell-scheduler:dev                               "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-scheduler
-065aab56deeb   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-nova
-298526a7f9c5   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-horizon
-9d7bf9252d86   4sell-app:dev                                     "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-integration-api
-57d5147f9296   4sell-worker:dev                                  "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-worker-very-long
-2f79ee4ec61d   4sell-worker:dev                                  "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-worker-long
-d5326752cfd4   4sell-worker:dev                                  "/usr/local/bin/dock…"   2 days ago    Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-worker-near-real-time
-fa89c3225332   forsell-web-platform-transcription-worker         "uvicorn app.api.mai…"   2 days ago    Up 3 hours (healthy)       8000/tcp                                                                             4sell-transcription-worker
-0dbe21400161   forsell-web-platform-device-telemetry-simulator   "python -m app.main"     2 days ago    Exited (137) 5 hours ago                                                                                        4sell-device-telemetry-simulator
-92d4315f3257   traefik:v3.6                                      "/entrypoint.sh --ap…"   2 days ago    Up 3 hours (healthy)       0.0.0.0:8080->80/tcp, [::]:8080->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp   4sell-traefik
-8c4fe91892fc   forsell-web-platform-mcp                          "uvicorn app.main:ap…"   13 days ago   Up 3 hours (healthy)       8000/tcp                                                                             4sell-mcp
-0845858ebed4   forsell-web-platform-transcription-api            "uvicorn app.api.mai…"   13 days ago   Up 3 hours (unhealthy)     8000/tcp                                                                             4sell-transcription-api
-45f0a1d58ff1   forsell-web-platform-transcription-beat           "celery -A transcrip…"   13 days ago   Up 3 hours                                                                                                      4sell-transcription-beat
-a568824bb32d   dunglas/mercure:v0.18                             "caddy run --config …"   13 days ago   Up 3 hours (healthy)       80/tcp, 443/tcp, 2019/tcp, 443/udp                                                   4sell-mercure
-5ab82dc8a9c3   valkey/valkey:8.0                                 "docker-entrypoint.s…"   13 days ago   Up 3 hours (healthy)       0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp                                          4sell-valkey
-44a27aec6441   forsell-web-platform-postgres                     "docker-entrypoint.s…"   13 days ago   Up 3 hours (healthy)       0.0.0.0:5488->5432/tcp, [::]:5488->5432/tcp                                          4sell-postgres
-83550e482a26   minio/mc:latest                                   "/bin/sh -c ' sleep …"   13 days ago   Exited (0) 3 hours ago                                                                                          4sell-minio-init
-a8c266b88eb8   minio/minio:latest                                "/usr/bin/docker-ent…"   13 days ago   Up 3 hours (healthy)       9000/tcp                                                                             4sell-minio
 Почему make check остается safe check.
 Запускает все функции для проверки багов и ошибок
 ## First-run notes
