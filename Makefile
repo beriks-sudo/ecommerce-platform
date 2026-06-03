@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := help
+.PHONY: docker-nginx-lifecycle
 
 .PHONY: help status log diff check
 
@@ -14,6 +15,7 @@ help:
 	@echo "  make docker-hello    - run hello-world smoke container"
 	@echo "  make docker-ps       - list containers, including exited"
 	@echo "  make check           - run safe Docker runtime checks"
+
 
 status:
 	git status --short
@@ -61,3 +63,5 @@ docker-hello:
 docker-ps:
 	docker ps -a
 
+docker-nginx-lifecycle:
+	./bin/nginx-lifecycle.sh
