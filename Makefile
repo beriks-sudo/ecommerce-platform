@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: docker-nginx-lifecycle
+.PHONY: docker-inspect-playbook
 
 .PHONY: help status log diff check
 
@@ -15,6 +16,7 @@ help:
 	@echo "  make docker-hello    - run hello-world smoke container"
 	@echo "  make docker-ps       - list containers, including exited"
 	@echo "  make check           - run safe Docker runtime checks"
+	@echo "  make docker-inspect-playbook - run safe Docker inspection playbook"
 
 
 status:
@@ -65,3 +67,6 @@ docker-ps:
 
 docker-nginx-lifecycle:
 	./bin/nginx-lifecycle.sh
+
+docker-inspect-playbook:
+	./bin/container-inspection-playbook.sh
