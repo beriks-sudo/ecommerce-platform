@@ -1,8 +1,9 @@
 .DEFAULT_GOAL := help
-.PHONY: docker-nginx-lifecycle
-.PHONY: docker-inspect-playbook
+IMAGE_NAME := ecommerce-php
+IMAGE_TAG := dev
+IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
+.PHONY: docker-nginx-lifecycle docker-inspect-playbook help status log diff check help docker-version docker-info docker-hello docker-ps check build run image-shell
 
-.PHONY: help status log diff check
 
 help:
 	@echo "make help    Show available commands"
@@ -49,7 +50,6 @@ history:
 
 .DEFAULT_GOAL := help
 
-.PHONY: help docker-version docker-info docker-hello docker-ps check
 
 
 
@@ -70,3 +70,12 @@ docker-nginx-lifecycle:
 
 docker-inspect-playbook:
 	./bin/container-inspection-playbook.sh
+
+build:
+	docker build -t $(IMAGE) -f docker/php/Dockerfile .
+
+run:
+	docker run --rm -p 8000:8000 $(IMAGE)
+
+image-shell:
+	docker run --rm -it $(IMAGE) sh
