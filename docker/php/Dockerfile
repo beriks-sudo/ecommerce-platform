@@ -1,6 +1,7 @@
 FROM php:8.5-cli-alpine
 
 WORKDIR /var/www/html
+COPY composer.json ./
 
 RUN php -v
 

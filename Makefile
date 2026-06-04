@@ -2,7 +2,7 @@
 IMAGE_NAME := ecommerce-php
 IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
-.PHONY: docker-nginx-lifecycle docker-inspect-playbook help status log diff check help docker-version docker-info docker-hello docker-ps check build run image-shell
+.PHONY: docker-nginx-lifecycle docker-inspect-playbook help status log diff check help docker-version docker-info docker-hello docker-ps check build run image-shell build-plain context-check
 
 
 help:
@@ -79,3 +79,12 @@ run:
 
 image-shell:
 	docker run --rm -it $(IMAGE) sh
+
+build-plain:
+	docker build --progress=plain -t $(IMAGE) -f docker/php/Dockerfile .
+
+context-check:
+	@test -f docker/php/Dockerfile
+	@test -f composer.json
+	@test -f .dockerignore
+	@echo "Context root looks ready for docker build"
