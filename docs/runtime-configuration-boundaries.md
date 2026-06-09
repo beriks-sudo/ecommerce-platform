@@ -1,8 +1,8 @@
 # Runtime configuration boundaries
 
 ## Что такое build-time
-build-time — это этап сборки образа (`docker build`).
-На нём работают `ARG` и инструкции Dockerfile (`FROM`, `WORKDIR`, `COPY`, `RUN`).
+build-time  это этап сборки образа docker build.
+
 
 ## Что такое runtime
 runtime — это этап запуска контейнера (`docker run`).
@@ -14,9 +14,7 @@ runtime — это этап запуска контейнера (`docker run`).
 `ARG` нельзя использовать для секретов — они могут попасть в build logs и history.
 
 ## Почему ENV APP_DIR допустим
-`ENV APP_DIR=/var/www/html` задаёт путь приложения внутри образа.
-Путь — это не секрет, он описывает структуру runtime, поэтому такой `ENV` безопасен
-и используется дальше в `WORKDIR` и `COPY`.
+
 
 ## Почему DB_PASSWORD нельзя класть в ARG, ENV или Dockerfile
 Пароль в Dockerfile становится частью истории и metadata образа — его увидит любой,
