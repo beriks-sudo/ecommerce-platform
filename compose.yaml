@@ -17,6 +17,13 @@
         - app
 
     mysql:
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 5s
+        timeout: 3s
+        retries: 20
+        start_period: 20
+      restart: unless-stopped
       image: mysql:8.4
       environment:
         MYSQL_DATABASE: ${DB_DATABASE:-ecommerce}
