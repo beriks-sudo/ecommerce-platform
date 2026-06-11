@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -115,3 +115,15 @@ storage:
 
 permissions:
 	./bin/check-writable-paths.sh
+
+edge-domains:
+	@echo "Checking localho.st names"
+	@for host in ecommerce.localho.st admin.ecommerce.localho.st api.ecommerce.localho.st; do \
+		echo "$$host"; \
+		(getent hosts "$$host" || nslookup "$$host" || true); \
+	done
+	@echo "If DNS is blocked, test routing later with: curl -I -H 'Host: ecommerce.localho.st' http://127.0.0.1"
+
+edge-boundary:
+	docker compose ps
+	docker compose config
