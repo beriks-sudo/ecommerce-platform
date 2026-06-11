@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -82,9 +82,7 @@ context-check:
 config-check:
 	APP_ENV=local DB_HOST=mysql DB_PASSWORD=secret bash bin/config-diagnostics.sh
 
-check: compose-config storage context-check build compose-config compose-config health compose-config network-check
-	docker run --rm $(IMAGE) php -v
-	$(MAKE) config-check
+check: compose-config permissions
 
 .DEFAULT:
 	@echo "Unknown target '$@'. Available targets:"
@@ -114,3 +112,6 @@ network-check:
 
 storage:
 	./bin/storage-inventory.sh
+
+permissions:
+	./bin/check-writable-paths.sh
