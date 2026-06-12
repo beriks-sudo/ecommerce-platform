@@ -1,4 +1,24 @@
 services:
+  traefik:
+    image: traefik:${TRAEFIK_VERSION:-v3.6.14}
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --api.dashboard=true
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.ecommerce.localho.st`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+
   app:
     networks: [frontend, backend]
     build:
@@ -15,10 +35,21 @@ services:
   web:
     networks: [frontend]
     image: nginx:1.27-alpine
-    ports:
-      - "${APP_PORT:-8080}:80"
     depends_on:
       - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-platform_frontend"
+      - "traefik.http.routers.storefront.rule=Host(`ecommerce.localho.st`)"
+      - "traefik.http.routers.storefront.entrypoints=web"
+      - "traefik.http.routers.storefront.service=web"
+      - "traefik.http.routers.admin.rule=Host(`admin.ecommerce.localho.st`)"
+      - "traefik.http.routers.admin.entrypoints=web"
+      - "traefik.http.routers.admin.service=web"
+      - "traefik.http.routers.api.rule=Host(`api.ecommerce.localho.st`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.service=web"
+      - "traefik.http.services.web.loadbalancer.server.port=80"
 
   mysql:
     networks: [backend]
@@ -48,3 +79,5 @@ networks:
 
 volumes:
   mysql_data:
+
+

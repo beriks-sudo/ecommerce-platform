@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -123,6 +123,9 @@ edge-domains:
 		(getent hosts "$$host" || nslookup "$$host" || true); \
 	done
 	@echo "If DNS is blocked, test routing later with: curl -I -H 'Host: ecommerce.localho.st' http://127.0.0.1"
+
+traefik-routes:
+	./bin/traefik-route-check.sh
 
 edge-boundary:
 	docker compose ps
