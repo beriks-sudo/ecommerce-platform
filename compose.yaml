@@ -30,7 +30,7 @@ services:
   app:
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "curl -fsS http://localhost:8000/ || exit 1" ]
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:8000/health.php || exit 1" ]
       interval: 10s
       timeout: 3s
       retries: 5

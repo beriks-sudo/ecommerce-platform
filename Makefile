@@ -136,6 +136,7 @@ logs:
 
 shell:
 	docker compose exec $(SERVICE) sh
+# health/doctor — только наблюдение, не меняют runtime (без restart/down/prune)
 health:
 	docker compose ps
 	docker inspect $$(docker compose ps -q $(SERVICE)) --format '{{json .State.Health}}'
