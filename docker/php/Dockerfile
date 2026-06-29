@@ -9,8 +9,10 @@ COPY . .
 
 FROM php:8.5-cli-alpine AS runtime
 
-# pdo_mysql нужен для readiness-проверки реального подключения к БД в public/health.php
-RUN docker-php-ext-install pdo_mysql
+# curl нужен для healthcheck (probe дергает /health.php),
+# pdo_mysql — для readiness-проверки реального подключения к БД в public/health.php
+RUN apk add --no-cache curl \
+    && docker-php-ext-install pdo_mysql
 
 ARG BUILD_MODE=production
 ENV APP_DIR=/var/www/html

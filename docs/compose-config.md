@@ -7,9 +7,13 @@
 
 ## Проверка
 
+Валидность проверяется реальной командой через скрипт `bin/compose-config-check.sh`
+(вызывается из `make compose-config` и `make check`):
+
 ```bash
-$ docker compose config -q ; echo "exit=$?"
-exit=0
+$ make compose-config
+==> docker compose config -q
+✅ compose config валиден (exit 0): ошибок и предупреждений нет
 ```
 
 `docker compose config` завершается с кодом 0 без ошибок и предупреждений, в том

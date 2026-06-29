@@ -53,8 +53,7 @@ services:
     networks: [frontend]
     image: nginx:1.27-alpine
     depends_on:
-      app:
-        condition: service_healthy
+      - app
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=ecommerce-platform_frontend"
