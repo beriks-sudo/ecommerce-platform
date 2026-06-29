@@ -99,9 +99,6 @@ down:
 compose-config:
 	./bin/compose-config-check.sh
 
-health:
-	./bin/check-health.sh
-
 network-check:
 	./bin/network-diagnostics.sh
 
@@ -139,6 +136,9 @@ logs:
 
 shell:
 	docker compose exec $(SERVICE) sh
+health:
+	docker compose ps
+	docker inspect $$(docker compose ps -q $(SERVICE)) --format '{{json .State.Health}}'
 
 doctor: ps
 	docker compose logs --tail=50 $(SERVICE)
