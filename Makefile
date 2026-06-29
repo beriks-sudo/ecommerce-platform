@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -126,7 +126,11 @@ edge-domains:
 
 traefik-routes:
 	./bin/traefik-route-check.sh
-
+local-certs:
+	bin/generate-local-certs.sh
+tls-check:
+	bin/tls-check.sh
 edge-boundary:
 	docker compose ps
 	docker compose config
+

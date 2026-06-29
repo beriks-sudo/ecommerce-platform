@@ -3,3 +3,7 @@ Thumbs.db
 .idea/
 vendor/
 .env
+docker/traefik/certs/*.key
+  docker/traefik/certs/*.crt
+  docker/traefik/certs/*.pem
+  docker/traefik/certs/*.cnf
