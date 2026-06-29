@@ -1,29 +1,47 @@
 <?php
-// Health endpoint: готовность приложения = его зависимости (MySQL, Redis) доступны по сети.
-// Возвращает 200, только если app может достучаться до обоих; иначе 503.
-// Проверяем доступность портов через сокет — не требует PHP-расширений (pdo_mysql и т.п.).
+// Health endpoint: готовность приложения = оно реально может работать со своими
+// зависимостями. Проверяем НЕ просто открытый порт, а живой ответ сервиса:
+//   - MySQL: выполняем запрос SELECT 1 через PDO;
+//   - Redis: посылаем PING и ждём +PONG.
+// Возвращает 200 только если обе проверки прошли, иначе 503.
 // Healthcheck в compose дергает этот URL, Docker смотрит на HTTP-код через curl -f.
 
-function tcp_ready(string $host, int $port, float $timeout = 2.0): bool {
-    $conn = @fsockopen($host, $port, $errno, $errstr, $timeout);
-    if ($conn === false) {
-        return false;
-    }
-    fclose($conn);
-    return true;
+$errors = [];
+
+// --- MySQL: реальный запрос ---
+try {
+    $pdo = new PDO(
+        'mysql:host=' . (getenv('DB_HOST') ?: 'mysql')
+            . ';dbname=' . (getenv('DB_DATABASE') ?: 'ecommerce'),
+        getenv('DB_USERNAME') ?: 'ecommerce',
+        getenv('DB_PASSWORD') ?: 'ecommerce_password',
+        [PDO::ATTR_TIMEOUT => 2, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
+    $pdo->query('SELECT 1')->fetchColumn();
+} catch (Throwable $e) {
+    $errors[] = 'mysql: ' . $e->getMessage();
 }
 
-$checks = [
-    'mysql' => tcp_ready(getenv('DB_HOST') ?: 'mysql', 3306),
-    'redis' => tcp_ready(getenv('REDIS_HOST') ?: 'redis', 6379),
-];
+// --- Redis: реальный PING/PONG ---
+try {
+    $conn = @fsockopen(getenv('REDIS_HOST') ?: 'redis', 6379, $errno, $errstr, 2);
+    if ($conn === false) {
+        throw new RuntimeException($errstr ?: 'connection failed');
+    }
+    fwrite($conn, "PING\r\n");
+    $reply = fgets($conn);
+    fclose($conn);
+    if (strpos((string) $reply, 'PONG') === false) {
+        throw new RuntimeException('unexpected reply: ' . trim((string) $reply));
+    }
+} catch (Throwable $e) {
+    $errors[] = 'redis: ' . $e->getMessage();
+}
 
-$failed = array_keys(array_filter($checks, fn ($ok) => $ok === false));
-
-if ($failed === []) {
+if ($errors === []) {
     http_response_code(200);
     echo 'ok';
 } else {
     http_response_code(503); // не готов → curl -f вернёт ненулевой код → unhealthy
-    echo 'unhealthy: unreachable ' . implode(', ', $failed);
+    echo 'unhealthy: ' . implode('; ', $errors);
 }
