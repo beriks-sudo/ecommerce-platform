@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: ps logs shell doctor local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -95,11 +95,6 @@ up:
 down:
 	docker compose down
 
-ps:
-	docker compose ps
-
-logs:
-	docker compose logs --tail=100
 
 compose-config:
 	./bin/compose-config-check.sh
@@ -134,3 +129,16 @@ edge-boundary:
 	docker compose ps
 	docker compose config
 
+SERVICE ?= app
+
+ps:
+	docker compose ps
+
+logs:
+	docker compose logs --tail=100 $(SERVICE)
+
+shell:
+	docker compose exec $(SERVICE) sh
+
+doctor: ps
+	docker compose logs --tail=50 $(SERVICE)
