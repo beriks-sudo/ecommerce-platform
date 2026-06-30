@@ -1,21 +1,28 @@
-Environment drift: два реальных риска
+# Environment drift: два реальных риска
 
 ## Риск 1 — IDE и terminal в разных Docker context
-На этой машине есть два context:
-- default        -> unix:///var/run/docker.sock
-- desktop-linux  -> unix:///Users/berik/.docker/run/docker.sock (активный в терминале)
+На этой машине есть два context (фактический список выводит
+`docker context ls`, его же печатает `bin/phpstorm-runtime-notes.sh`):
 
-Если PhpStorm подключится к default, а терминал работает в desktop-linux (или
-наоборот), они будут смотреть на разные socket и могут показывать разные
+```
+default          -> unix:///var/run/docker.sock
+desktop-linux *  -> unix:///Users/berik/.docker/run/docker.sock   (активный)
+```
+
+Если PhpStorm подключится к `default`, а терминал работает в `desktop-linux`
+(или наоборот), они будут смотреть на разные socket и могут показывать разные
 контейнеры. Тогда кажется, что «проект пропал», хотя сломан только путь IDE
-к Engine. Проверка: docker context ls / docker version / docker info.
+к Engine. Проверка: `docker context ls`, `docker version`, `docker info`.
 
 ## Риск 2 — IDE запускает PHP через host PHP, а приложение в container PHP
-Приложение работает в сервисе app (образ php:8.5-alpine, с установленным
-pdo_mysql и нужной настройкой). А на host стоит Homebrew PHP:
+Приложение работает в сервисе `app` (образ `php:8.5-alpine`, с установленным
+`pdo_mysql`). На host стоит отдельный Homebrew PHP — проверяется командами
+`which php` и `php -v`:
 
-      which php   -> /opt/homebrew/bin/php
-      php -v      -> PHP 8.5.6 (cli), другой php.ini, другой набор расширений
+```
+which php  -> /opt/homebrew/bin/php
+php -v     -> PHP 8.5.6 (cli)   # другой php.ini, другой набор расширений
+```
 
 Если в PhpStorm не выбрать remote PHP interpreter внутри контейнера, Composer
 и тесты пойдут через host PHP. Тогда «зелёный» результат в IDE перестаёт

@@ -1,4 +1,4 @@
-PhpStorm Docker connection
+# PhpStorm Docker connection
 
 ## Модель
 PhpStorm — это Docker client, а не отдельный runtime. Контейнеры создаёт и
@@ -7,19 +7,25 @@ PhpStorm — это Docker client, а не отдельный runtime. Конт�
 терминал (`docker compose ps`) и Services tool window в IDE.
 
 ## Какой Docker context ожидается локально
-Активный context на этой машине — desktop-linux (Docker Desktop):
+Ожидаемый активный context для локальной работы — **desktop-linux** (Docker
+Desktop на macOS). Фактическую конфигурацию на машине показывает безопасный
+диагностический скрипт `bin/phpstorm-runtime-notes.sh` (он выполняет
+`docker context ls` и `docker version`). На момент написания вывод был такой:
 
-      docker context ls
-      NAME              DOCKER ENDPOINT
-      default           unix:///var/run/docker.sock
-      desktop-linux *   unix:///Users/berik/.docker/run/docker.sock
+```
+NAME              DOCKER ENDPOINT
+default           unix:///var/run/docker.sock
+desktop-linux *   unix:///Users/berik/.docker/run/docker.sock
+```
 
-IDE должна использовать тот же Engine, что и терминал, — desktop-linux.
+Звёздочка отмечает активный context. IDE должна использовать тот же Engine, что
+и терминал, — `desktop-linux`. Проверить актуальное состояние можно командой
+`docker context ls` или скриптом.
 
 ## Socket / context указывают IDE, куда обращаться
 context — это сохранённый адрес Docker API (Unix socket демона). Если IDE
-настроена на другой context (например default), чем активный в терминале
-(desktop-linux), она достучится до другого socket и покажет другую/пустую
+настроена на другой context (например `default`), чем активный в терминале
+(`desktop-linux`), она достучится до другого socket и покажет другую/пустую
 картину, хотя проект исправен.
 
 ## Local проще remote
