@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: ps logs shell doctor local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: stats top inspect-limits ps logs shell doctor local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -143,3 +143,12 @@ health:
 
 doctor: ps
 	docker compose logs --tail=50 $(SERVICE)
+
+stats:
+	docker stats --no-stream
+
+top:
+	docker compose top
+
+inspect-limits:
+	docker inspect $$(docker compose ps -q $(SERVICE)) --format 'memory={{.HostConfig.Memory}} nano_cpus={{.HostConfig.NanoCpus}}'
