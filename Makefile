@@ -4,7 +4,7 @@ IMAGE_TAG := dev
 IMAGE := $(IMAGE_NAME):$(IMAGE_TAG)
 BUILD_MODE ?= local
 
-.PHONY: stats top inspect-limits ps logs shell doctor local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
+.PHONY: cleanup-inventory docker-df builder-du docker-images docker-containers docker-volumes stats top inspect-limits ps logs shell doctor local-certs tls-check traefik-routes edge-domains edge-boundary permissions storage network-check health help status log diff check history docker-version docker-info docker-hello docker-ps docker-nginx-lifecycle docker-inspect-playbook build build-builder run image-shell build-plain context-check config-check up down ps logs compose-config check
 
 help:
 	@echo "make help    Show available commands"
@@ -152,3 +152,20 @@ top:
 
 inspect-limits:
 	docker inspect $$(docker compose ps -q $(SERVICE)) --format 'memory={{.HostConfig.Memory}} nano_cpus={{.HostConfig.NanoCpus}}'
+
+cleanup-inventory: docker-df builder-du docker-images docker-containers docker-volumes
+
+docker-df:
+	docker system df
+
+builder-du:
+	docker builder du
+
+docker-images:
+	docker image ls
+
+docker-containers:
+	docker container ls -a
+
+docker-volumes:
+	docker volume ls
